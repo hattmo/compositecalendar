@@ -1,0 +1,33 @@
+{
+    "version": "1.0.0",
+    "author": "hattmo",
+    "license": "GPL-3.0-or-later",
+    "name": "@hattmo/compositecalendar",
+    "description": "Combined and Filters Google Calendars",
+    "scripts": {
+        "test": "mocha -r ts-node/register --bail ./test/**/*Test.ts",
+        "build": "webpack --mode production",
+        "start": "webpack-dev-server --content-base=dist --inline --watch --hot"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.2.7",
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^12.12.20",
+        "@types/react": "^16.9.16",
+        "@types/react-dom": "^16.9.4",
+        "@types/react-router-dom": "^5.1.3",
+        "chai": "^4.2.0",
+        "html-webpack-plugin": "^3.2.0",
+        "mocha": "^6.2.2",
+        "react": "^16.12.0",
+        "react-dom": "^16.12.0",
+        "react-router-dom": "^5.1.2",
+        "ts-loader": "^6.2.1",
+        "ts-node": "^8.5.4",
+        "tslint": "^5.20.1",
+        "typescript": "^3.7.3",
+        "webpack": "^4.41.3",
+        "webpack-cli": "^3.3.10",
+        "webpack-dev-server": "^3.9.0"
+    }
+}
