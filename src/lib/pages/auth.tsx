@@ -1,13 +1,18 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Redirect } from "react-router-dom";
 
-export default () => {
+interface IProps {
+    onFailedLogin: () => void;
+    onSuccessfulLogin: (string) => void;
+}
+
+export default ({ onFailedLogin, onSuccessfulLogin }: IProps) => {
     const code = new URLSearchParams(useLocation().search).get("code");
-    return (
-        typeof code === "string" ? (
-
-        ): (
-
-            )
-    );
+    if (typeof code === "string") {
+        onSuccessfulLogin(code);
+        return (<Redirect to="/" />);
+    } else {
+        onFailedLogin();
+        return (<Redirect to="/" />);
+    }
 };

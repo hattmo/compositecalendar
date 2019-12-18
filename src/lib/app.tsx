@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import { useLocalStorage } from "web-api-hooks";
 import Auth from "./pages/auth";
@@ -6,16 +6,18 @@ import Login from "./pages/login";
 import Home from "./pages/home";
 
 export default () => {
-    const [accessKey] = useLocalStorage<string>("accessKey", null);
+    const [accessKey, setAccessKey] = useLocalStorage<string | null>("accessKey", null);
+    const [failedLogin, setFailedLogin] = useState(false);
     let routes;
     if (accessKey === null) {
         routes = (
             <Switch>
                 <Route path="/login">
-                    <Login />
+                    <Login isFailedLogin={failedLogin} />
                 </Route>
                 <Route path="/auth">
-                    <Auth />
+                    <Auth onFailedLogin={() => { setFailedLogin(true); }}
+                        onSuccessfulLogin={setAccessKey} />
                 </Route>
                 <Route>
                     <Redirect to="/login" />
@@ -25,7 +27,7 @@ export default () => {
     } else {
         routes = (
             <Route path="/" >
-                <Home />
+                <Home logoutClicked={() => { setAccessKey(null); }} />
             </Route>
         );
     }

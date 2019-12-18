@@ -1,7 +1,15 @@
 import React from "react";
 
-export default () => {
+interface IProps {
+    logoutClicked: () => void;
+}
+
+export default ({ logoutClicked }: IProps) => {
     return (
-        <h1>IM HOME</h1>
+        <div>
+
+            <h1>IM HOME</h1>
+            <button onClick={() => { logoutClicked() }}>logout</button>
+        </div>
     );
 };
