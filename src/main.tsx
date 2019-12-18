@@ -1,11 +1,13 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import App from "./lib/app";
+import ReactDom from "react-dom";
+import Index from "./lib/app";
+import "./index.html";
+import "./favicon.ico";
 
 const root = document.createElement("div");
 document.body.appendChild(root);
 
-ReactDOM.render(
-  <App />,
+ReactDom.render(
+  (<Index />),
   root,
 );

@@ -1,33 +1,26 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const ts = {
   test: /\.ts(x)?$/,
-  use: [
-    {
-      loader: 'ts-loader',
-    },
-  ],
+  use: 'ts-loader',
 };
+const html = {
+  test: /\.(html|ico)$/,
+  loader: 'file-loader',
+  options: {
+    name: '[name].[ext]',
+  }
+}
 
 const config = {
   entry: './src/main.tsx',
   output: {
-    path: path.resolve(__dirname, 'dist/'),
+    path: path.resolve(__dirname, 'dist/client/'),
     filename: 'bundle.js',
   },
   module: {
-    rules: [ts],
+    rules: [ts, html],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      title: 'Test',
-      filename: 'index.html',
-      inject: 'body',
-      meta: { viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no' },
-      minify: /staging/.test(process.env.NODE_ENV),
-    }),
-  ],
   resolve: {
     extensions: [' ', '.js', '.jsx', '.ts', '.tsx'],
   },
