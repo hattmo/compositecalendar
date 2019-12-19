@@ -1,7 +1,9 @@
 {
     "extends": "tslint:recommended",
     "defaultSeverity": "error",
-    "jsRules": {},
+    "jsRules": {
+        "variable-name": false
+    },
     "rules": {
         "ordered-imports": false,
         "object-literal-sort-keys": false,

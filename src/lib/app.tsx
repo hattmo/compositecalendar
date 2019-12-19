@@ -6,10 +6,10 @@ import Login from "./pages/login";
 import Home from "./pages/home";
 
 export default () => {
-    const [accessKey, setAccessKey] = useLocalStorage<string | null>("accessKey", null);
+    const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessKey", null);
     const [failedLogin, setFailedLogin] = useState(false);
     let routes;
-    if (accessKey === null) {
+    if (accessToken === null) {
         routes = (
             <Switch>
                 <Route path="/login">
@@ -17,17 +17,17 @@ export default () => {
                 </Route>
                 <Route path="/auth">
                     <Auth onFailedLogin={() => { setFailedLogin(true); }}
-                        onSuccessfulLogin={setAccessKey} />
+                        onSuccessfulLogin={setAccessToken} />
                 </Route>
                 <Route>
                     <Redirect to="/login" />
                 </Route>
             </Switch>
-        )
+        );
     } else {
         routes = (
             <Route path="/" >
-                <Home logoutClicked={() => { setAccessKey(null); }} />
+                <Home access_token={accessToken} logout={() => { setAccessToken(null); }} />
             </Route>
         );
     }
@@ -36,6 +36,4 @@ export default () => {
             {routes}
         </Router>
     );
-
-
 };
