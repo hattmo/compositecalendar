@@ -16,19 +16,25 @@ export default ({ logout, access_token }: IProps) => {
                     Authorization: `Bearer ${access_token}`,
                 },
             });
-            const filtered = (await response.json()).items.map((item) => {
-                return {
-                    id: item.id,
-                    name: item.summary,
-                };
-            });
-            setCalendarList(filtered);
+            if (response.ok) {
+                const json = await response.json();
+                const filtered = json.items.map((item) => {
+                    return {
+                        id: item.id,
+                        name: item.summary,
+                        accessRole: item.accessRole,
+                    };
+                });
+                setCalendarList(filtered);
+            } else {
+                logout("");
+            }
         })();
     }, [access_token]);
     return (
         <div>
             <h1>HOME</h1>
-            <Rule calendarList={calendarList} />
+            <Rule access_token={access_token} calendarList={calendarList} logout={logout} />
             <button onClick={() => { logout("Logout Successful"); }}>logout</button>
         </div>
     );

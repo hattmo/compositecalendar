@@ -1,16 +1,16 @@
 import React from "react";
 import { ICalendar } from "../../types";
 interface IProps {
-    items: ICalendar[];
-    selectedItem?: ICalendar;
-    setSelectedItem: (item: ICalendar) => void;
+    cals: ICalendar[];
+    selectedCal?: ICalendar;
+    setSelectedCal: (item: ICalendar) => void;
 }
 
-export default ({ items, selectedItem, setSelectedItem }: IProps) => {
-    if (selectedItem !== undefined) {
+export default ({ cals, selectedCal, setSelectedCal }: IProps) => {
+    if (selectedCal !== undefined) {
         return (
-            <select value={items.indexOf(selectedItem)} onChange={(e) => { setSelectedItem(items[e.target.value]); }}>
-                {items.map((item, index) => {
+            <select value={cals.indexOf(selectedCal)} onChange={(e) => { setSelectedCal(cals[e.target.value]); }}>
+                {cals.map((item, index) => {
                     return (
                         <option value={index} key={index}>
                             {item.name}
@@ -19,8 +19,8 @@ export default ({ items, selectedItem, setSelectedItem }: IProps) => {
                 })}
             </select>
         );
-    } else if (items.length > 0) {
-        setSelectedItem(items[0]);
+    } else if (cals.length > 0) {
+        setSelectedCal(cals[0]);
     }
     return (
         <select>

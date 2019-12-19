@@ -7,16 +7,16 @@ import Home from "./pages/home";
 
 export default () => {
     const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessKey", null);
-    const [failedLogin, setFailedLogin] = useState(false);
+    const [loginMessage, setLoginMessage] = useState("");
     let routes;
     if (accessToken === null) {
         routes = (
             <Switch>
                 <Route path="/login">
-                    <Login isFailedLogin={failedLogin} />
+                    <Login message={loginMessage} />
                 </Route>
                 <Route path="/auth">
-                    <Auth onFailedLogin={() => { setFailedLogin(true); }}
+                    <Auth onFailedLogin={() => { setLoginMessage("Failed to Login"); }}
                         onSuccessfulLogin={setAccessToken} />
                 </Route>
                 <Route>
@@ -27,7 +27,10 @@ export default () => {
     } else {
         routes = (
             <Route path="/" >
-                <Home access_token={accessToken} logout={() => { setAccessToken(null); }} />
+                <Home access_token={accessToken} logout={(message) => {
+                    setLoginMessage(message);
+                    setAccessToken(null);
+                }} />
             </Route>
         );
     }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import SelectCal from "./selectCal";
-import { ICalendar } from "../../types";
-import InputCalList from "../components/inputCalList";
+import SelectCal from "../selectCal";
+import { ICalendar } from "../../../types";
+import InputCalList from "./inputCalList";
 
 interface IProps {
     calendarList: ICalendar[];
@@ -14,16 +14,16 @@ export default ({ calendarList, inputCals, setInputCals }: IProps) => {
         <div>
             <div>
                 <SelectCal
-                    setSelectedItem={setSelectedInputCal}
-                    selectedItem={selectedInputCal}
-                    items={calendarList} />
+                    setSelectedCal={setSelectedInputCal}
+                    selectedCal={selectedInputCal}
+                    cals={calendarList} />
             </div>
             <button onClick={() => {
-                if (selectedInputCal !== undefined) {
+                if (selectedInputCal !== undefined && !inputCals.includes(selectedInputCal)) {
                     setInputCals([selectedInputCal, ...inputCals]);
                 }
             }}>Add</button>
-            <InputCalList inputCals={inputCals} />
+            <InputCalList setInputCals={setInputCals} inputCals={inputCals} />
         </div>
     );
 };
