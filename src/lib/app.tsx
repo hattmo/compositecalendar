@@ -27,7 +27,7 @@ export default () => {
     } else {
         routes = (
             <Route path="/" >
-                <Home access_token={accessToken} logout={(message) => {
+                <Home accessToken={accessToken} logout={(message) => {
                     setLoginMessage(message);
                     setAccessToken(null);
                 }} />
