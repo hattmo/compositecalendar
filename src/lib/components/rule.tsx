@@ -12,24 +12,38 @@ interface IProps {
     setSavedSettings: (newSettings: ISetting) => void;
 }
 
-export default ({ calendarList, accessToken, logout, savedSettings, setSavedSettings }: IProps) => {
+export default ({
+    calendarList,
+    accessToken,
+    logout,
+    savedSettings,
+    setSavedSettings,
+}: IProps) => {
+    const { inputCals, outputCal, startDate, endDate, regex } = savedSettings;
     const [errorMessage, setErrorMessage] = useState(<div />);
-    const [inputCals, setInputCals] = useState<ICalendar[]>(savedSettings.inputCals);
-    const [outputCal, setOutputCal] = useState<ICalendar | undefined>(savedSettings.outputCal);
-    const [startDate, setStartDate] = useState(savedSettings.startDate);
-    const [endDate, setEndDate] = useState(savedSettings.endDate);
-    const [regex, setRegex] = useState(savedSettings.regex);
+
     const writableCalendars = useMemo(() => {
         return calendarList.filter((item) => {
             return (item.accessRole === "writer" || item.accessRole === "owner");
         });
     }, [calendarList]);
+    const upDateSave = (field: string) => {
+        return ((value) => {
+            console.log(value);
+            setSavedSettings({
+                ...savedSettings,
+                [field]: value,
+            });
+        });
+    };
     return (
         <div>
-            <InputCalBlock calendarList={calendarList} inputCals={inputCals} setInputCals={setInputCals} />
+            <InputCalBlock calendarList={calendarList} inputCals={inputCals} setInputCals={upDateSave("inputCals")} />
             <FilterBlock validRegex={checkRegex(regex)} startDate={startDate} endDate={endDate} regex={regex}
-                setStartDate={setStartDate} setEndDate={setEndDate} setRegex={setRegex} />
-            <OutputCalBlock calendarList={writableCalendars} outputCal={outputCal} setOutputCal={setOutputCal} />
+                setStartDate={upDateSave("startDate")} setEndDate={upDateSave("endDate")}
+                setRegex={upDateSave("regex")} />
+            <OutputCalBlock calendarList={writableCalendars}
+                outputCal={outputCal} setOutputCal={upDateSave("outputCal")} />
             <button onClick={async () => {
                 if (inputCals.length === 0) {
                     setErrorMessage(<div>Please select one or more input calendars</div>);
@@ -58,15 +72,6 @@ export default ({ calendarList, accessToken, logout, savedSettings, setSavedSett
                     }
                 }
             }}>Build</button>
-            <button onClick={() => {
-                setSavedSettings({
-                    startDate,
-                    endDate,
-                    inputCals,
-                    outputCal,
-                    regex,
-                });
-            }}>Save</button>
             {errorMessage}
         </div>
     );

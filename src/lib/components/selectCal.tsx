@@ -8,11 +8,16 @@ interface IProps {
 
 export default ({ cals, selectedCal, setSelectedCal }: IProps) => {
     if (selectedCal !== undefined) {
+        const selectedCalId = selectedCal.id;
         return (
-            <select value={cals.indexOf(selectedCal)} onChange={(e) => { setSelectedCal(cals[e.target.value]); }}>
+            <select value={selectedCalId} onChange={(e) => {
+                setSelectedCal(cals.find((item) => {
+                    return item.id === e.target.value;
+                }) ?? cals[0]);
+            }}>
                 {cals.map((item, index) => {
                     return (
-                        <option value={index} key={index}>
+                        <option value={item.id} key={index}>
                             {item.name}
                         </option>
                     );

@@ -10,12 +10,12 @@ interface IProps {
 
 export default ({ logout, accessToken }: IProps) => {
     const [calendarList, setCalendarList] = useState<ICalendar[]>([]);
-    const [savedSettings, setSavedSettings] = useDrive<ISetting>("compositeCalendarData", {
+    const [savedSettings, setSavedSettings] = useDrive<ISetting[]>("compositeCalendarData", [{
         startDate: "",
         endDate: "",
         inputCals: [],
         regex: "",
-    }, accessToken);
+    }], accessToken);
     console.log(savedSettings);
     useEffect(() => {
         (async () => {
@@ -42,9 +42,31 @@ export default ({ logout, accessToken }: IProps) => {
     return (
         <div>
             <h1>HOME</h1>
-            <Rule savedSettings={savedSettings} setSavedSettings={setSavedSettings}
-                accessToken={accessToken} calendarList={calendarList} logout={logout} />
-            <button onClick={() => { logout("Logout Successful"); }}>logout</button>
+            {savedSettings.map((item, index) => {
+                return (<div><Rule
+                    key={index} savedSettings={item}
+                    accessToken={accessToken} calendarList={calendarList} logout={logout}
+                    setSavedSettings={(newSetting) => {
+                        const updatedSettings = savedSettings.map((oldSetting, i) => {
+                            if (i === index) {
+                                return newSetting;
+                            } else {
+                                return oldSetting;
+                            }
+                        });
+                        setSavedSettings(updatedSettings);
+                    }}
+                /><br /></div>);
+            })}
+            <button onClick={() => {
+                setSavedSettings([...savedSettings, {
+                    startDate: "",
+                    endDate: "",
+                    inputCals: [],
+                    regex: "",
+                }]);
+            }}>Add Rule</button>
+            <button onClick={() => { logout("Logout Successful"); }}>Logout</button>
         </div>
     );
 };
