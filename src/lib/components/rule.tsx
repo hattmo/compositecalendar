@@ -1,22 +1,24 @@
 import React, { useState, useMemo } from "react";
 import InputCalBlock from "./inputCal/inputCalBlock";
-import { ICalendar, IEventList, IEvent } from "../../types";
+import { ICalendar, IEventList, IEvent, ISetting } from "../../types";
 import FilterBlock from "./filter/filterBlock";
 import OutputCalBlock from "./outputCal/outputCalBlock";
-import wait from "./helpers/wait";
+import wait from "../helpers/wait";
 interface IProps {
     calendarList: ICalendar[];
     accessToken: string;
     logout: (message: string) => void;
+    savedSettings: ISetting;
+    setSavedSettings: (newSettings: ISetting) => void;
 }
 
-export default ({ calendarList, accessToken: accessToken, logout }: IProps) => {
+export default ({ calendarList, accessToken, logout, savedSettings, setSavedSettings }: IProps) => {
     const [errorMessage, setErrorMessage] = useState(<div />);
-    const [inputCals, setInputCals] = useState<ICalendar[]>([]);
-    const [outputCal, setOutputCal] = useState<ICalendar>();
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [regex, setRegex] = useState("");
+    const [inputCals, setInputCals] = useState<ICalendar[]>(savedSettings.inputCals);
+    const [outputCal, setOutputCal] = useState<ICalendar | undefined>(savedSettings.outputCal);
+    const [startDate, setStartDate] = useState(savedSettings.startDate);
+    const [endDate, setEndDate] = useState(savedSettings.endDate);
+    const [regex, setRegex] = useState(savedSettings.regex);
     const writableCalendars = useMemo(() => {
         return calendarList.filter((item) => {
             return (item.accessRole === "writer" || item.accessRole === "owner");
@@ -56,6 +58,15 @@ export default ({ calendarList, accessToken: accessToken, logout }: IProps) => {
                     }
                 }
             }}>Build</button>
+            <button onClick={() => {
+                setSavedSettings({
+                    startDate,
+                    endDate,
+                    inputCals,
+                    outputCal,
+                    regex,
+                });
+            }}>Save</button>
             {errorMessage}
         </div>
     );

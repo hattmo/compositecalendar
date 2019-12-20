@@ -6,6 +6,14 @@ export interface ICalendar {
 
 type AccessRole = "reader" | "owner" | "freeBusyReader" | "writer";
 
+export interface ISetting {
+    inputCals: ICalendar[],
+    outputCal?: ICalendar,
+    startDate: string,
+    endDate: string,
+    regex: string,
+}
+
 export interface IEventList {
 
     "kind": "calendar#events",

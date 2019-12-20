@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ICalendar } from "../../types";
+import { ICalendar, ISetting } from "../../types";
+import useDrive from "../helpers/useDrive";
 import Rule from "../components/rule";
 
 interface IProps {
@@ -9,6 +10,13 @@ interface IProps {
 
 export default ({ logout, accessToken }: IProps) => {
     const [calendarList, setCalendarList] = useState<ICalendar[]>([]);
+    const [savedSettings, setSavedSettings] = useDrive<ISetting>("compositeCalendarData", {
+        startDate: "",
+        endDate: "",
+        inputCals: [],
+        regex: "",
+    }, accessToken);
+    console.log(savedSettings);
     useEffect(() => {
         (async () => {
             const response = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
@@ -34,7 +42,8 @@ export default ({ logout, accessToken }: IProps) => {
     return (
         <div>
             <h1>HOME</h1>
-            <Rule accessToken={accessToken} calendarList={calendarList} logout={logout} />
+            <Rule savedSettings={savedSettings} setSavedSettings={setSavedSettings}
+                accessToken={accessToken} calendarList={calendarList} logout={logout} />
             <button onClick={() => { logout("Logout Successful"); }}>logout</button>
         </div>
     );
