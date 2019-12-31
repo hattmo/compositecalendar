@@ -17,7 +17,7 @@ export default ({ calendarList, inputItems, setInputItems, style, ...rest }: IPr
                 setSelectedCal={setSelectedInputCal}
                 selectedCal={selectedInputCal}
                 cals={calendarList} />
-            <button style={{ gridArea: "add" }} onClick={() => {
+            <div style={{ gridArea: "add" }} onClick={() => {
                 if (selectedInputCal !== undefined &&
                     inputItems
                         .map((item) => item.cal)
@@ -28,7 +28,7 @@ export default ({ calendarList, inputItems, setInputItems, style, ...rest }: IPr
                         regex: "",
                     }, ...inputItems]);
                 }
-            }}>Add</button>
+            }}>➕</div>
             <InputCalList style={{ gridArea: "items" }} inputItems={inputItems} setInputItems={setInputItems} />
         </div >
     );
@@ -36,6 +36,8 @@ export default ({ calendarList, inputItems, setInputItems, style, ...rest }: IPr
 
 const defaultStyle: React.CSSProperties = {
     display: "grid",
+    gap: "4px",
+    gridTemplateColumns: "400px min-content",
     gridTemplateAreas: `"input add"
                         "items items"`,
 };

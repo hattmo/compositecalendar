@@ -26,7 +26,7 @@ export default () => {
         );
     } else {
         routes = (
-            <Route path="/" >
+            <Route >
                 <Home accessToken={accessToken} logout={(message) => {
                     setLoginMessage(message);
                     setAccessToken(null);

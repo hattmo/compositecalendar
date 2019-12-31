@@ -6,13 +6,19 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     setInputItems: (newInput: IInputItem[]) => void;
 }
 
-export default ({ inputItems, setInputItems, ...rest }: IProps) => {
+export default ({ inputItems, setInputItems, style, ...rest }: IProps) => {
     return (
-        <div {...rest}>
+        <div style={{
+            display: "grid",
+            gap: "4px",
+            ...style,
+        }} {...rest}>
             {inputItems.map((item, index) => {
                 return (
                     <div style={itemStyle} key={index}>
                         <div style={{
+                            width: "100%",
+                            placeSelf: "start",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
@@ -25,7 +31,7 @@ export default ({ inputItems, setInputItems, ...rest }: IProps) => {
                         <input type="text" value={item.regex} onChange={(e) => {
                             setInputItems(updateRegex(e, inputItems, index));
                         }} />
-                        <span onClick={() => { setInputItems(inputItems.filter((_item, i) => i !== index)); }}> X</span>
+                        <div onClick={() => { setInputItems(inputItems.filter((_item, i) => i !== index)); }}>🗑️</div>
                     </div>
                 );
             })}
@@ -68,8 +74,8 @@ const updateRegex = (
 };
 
 const itemStyle: React.CSSProperties = {
+    gap: "4px",
     display: "grid",
-    border: "2px solid black",
-    gridTemplateColumns: "1fr min-content 1fr min-content",
+    gridTemplateColumns: "auto min-content min-content min-content",
     placeItems: "center",
 };

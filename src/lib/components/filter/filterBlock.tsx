@@ -11,7 +11,9 @@ export default ({ startDate, setStartDate, endDate, setEndDate, ...rest }: IProp
 
     return (
         <div {...rest}>
+            <div>From:</div>
             <input type="date" value={startDate} onChange={(e) => { setStartDate(e.currentTarget.value); }} />
+            <div>To:</div>
             <input type="date" value={endDate} onChange={(e) => { setEndDate(e.currentTarget.value); }} />
         </div>
     );
