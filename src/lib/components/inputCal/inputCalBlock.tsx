@@ -1,29 +1,41 @@
 import React, { useState } from "react";
 import SelectCal from "../selectCal";
-import { ICalendar } from "../../../types";
+import { ICalendar, IInputItem } from "../../../types";
 import InputCalList from "./inputCalList";
 
-interface IProps {
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     calendarList: ICalendar[];
-    inputCals: ICalendar[];
-    setInputCals: (newCals: ICalendar[]) => void;
+    inputItems: IInputItem[];
+    setInputItems: (newItems: IInputItem[]) => void;
 }
-export default ({ calendarList, inputCals, setInputCals }: IProps) => {
+export default ({ calendarList, inputItems, setInputItems, style, ...rest }: IProps) => {
     const [selectedInputCal, setSelectedInputCal] = useState<ICalendar>();
     return (
-        <div>
-            <div>
-                <SelectCal
-                    setSelectedCal={setSelectedInputCal}
-                    selectedCal={selectedInputCal}
-                    cals={calendarList} />
-            </div>
-            <button onClick={() => {
-                if (selectedInputCal !== undefined && !inputCals.includes(selectedInputCal)) {
-                    setInputCals([selectedInputCal, ...inputCals]);
+        <div style={{ ...defaultStyle, ...style }} {...rest}>
+            <SelectCal
+                style={{ gridArea: "input" }}
+                setSelectedCal={setSelectedInputCal}
+                selectedCal={selectedInputCal}
+                cals={calendarList} />
+            <button style={{ gridArea: "add" }} onClick={() => {
+                if (selectedInputCal !== undefined &&
+                    inputItems
+                        .map((item) => item.cal)
+                        .findIndex((item) => item.id === selectedInputCal.id) === -1) {
+                    setInputItems([{
+                        cal: selectedInputCal,
+                        exclude: false,
+                        regex: "",
+                    }, ...inputItems]);
                 }
             }}>Add</button>
-            <InputCalList setInputCals={setInputCals} inputCals={inputCals} />
-        </div>
+            <InputCalList style={{ gridArea: "items" }} inputItems={inputItems} setInputItems={setInputItems} />
+        </div >
     );
+};
+
+const defaultStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateAreas: `"input add"
+                        "items items"`,
 };

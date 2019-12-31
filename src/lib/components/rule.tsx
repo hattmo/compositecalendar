@@ -1,15 +1,16 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import InputCalBlock from "./inputCal/inputCalBlock";
-import { ICalendar, IEventList, IEvent, ISetting } from "../../types";
+import { ICalendar, ISetting } from "../../types";
 import FilterBlock from "./filter/filterBlock";
-import OutputCalBlock from "./outputCal/outputCalBlock";
-import wait from "../helpers/wait";
-interface IProps {
+import SelectCal from "./selectCal";
+import { getFilteredEvents, removeEventsFromOutput, addEventsToOutput } from "../helpers/calendarApis";
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     calendarList: ICalendar[];
     accessToken: string;
     logout: (message: string) => void;
     savedSettings: ISetting;
     setSavedSettings: (newSettings: ISetting) => void;
+    remove: () => void;
 }
 
 export default ({
@@ -18,9 +19,11 @@ export default ({
     logout,
     savedSettings,
     setSavedSettings,
+    remove,
+    style,
+    ...rest
 }: IProps) => {
-    const { inputCals, outputCal, startDate, endDate, regex } = savedSettings;
-    const [errorMessage, setErrorMessage] = useState(<div />);
+    const { inputItems, outputCal, startDate, endDate } = savedSettings;
 
     const writableCalendars = useMemo(() => {
         return calendarList.filter((item) => {
@@ -29,7 +32,6 @@ export default ({
     }, [calendarList]);
     const upDateSave = (field: string) => {
         return ((value) => {
-            console.log(value);
             setSavedSettings({
                 ...savedSettings,
                 [field]: value,
@@ -37,34 +39,36 @@ export default ({
         });
     };
     return (
-        <div>
-            <InputCalBlock calendarList={calendarList} inputCals={inputCals} setInputCals={upDateSave("inputCals")} />
-            <FilterBlock validRegex={checkRegex(regex)} startDate={startDate} endDate={endDate} regex={regex}
-                setStartDate={upDateSave("startDate")} setEndDate={upDateSave("endDate")}
-                setRegex={upDateSave("regex")} />
-            <OutputCalBlock calendarList={writableCalendars}
-                outputCal={outputCal} setOutputCal={upDateSave("outputCal")} />
-            <button onClick={async () => {
-                if (inputCals.length === 0) {
-                    setErrorMessage(<div>Please select one or more input calendars</div>);
+        <div style={{ ...defaultStyle, ...style }} {...rest}>
+            <div style={{ gridArea: "inputT", placeSelf: "center" }}>Input Calendars</div>
+            <div style={{ gridArea: "dateT", placeSelf: "center" }}>Date Range</div>
+            <div style={{ gridArea: "outputT", placeSelf: "center" }}>Output Calendar</div>
+            <InputCalBlock style={{ gridArea: "input" }} calendarList={calendarList}
+                inputItems={inputItems} setInputItems={upDateSave("inputItems")} />
+            <FilterBlock style={{ gridArea: "date" }} startDate={startDate} endDate={endDate}
+                setStartDate={upDateSave("startDate")} setEndDate={upDateSave("endDate")} />
+            <SelectCal style={{ gridArea: "output" }} cals={writableCalendars}
+                selectedCal={outputCal} setSelectedCal={upDateSave("outputCal")} />
+            <button style={{ gridArea: "remove" }} onClick={remove}>Remove</button>
+            <button style={{ gridArea: "build" }} onClick={async () => {
+                if (inputItems.length === 0) {
+                    console.log("Please select one or more input calendars");
                     return;
                 } else if (startDate === "" || endDate === "") {
-                    setErrorMessage(<div>Please select a start and end date</div>);
+                    console.log("Please select a start and end date");
                     return;
                 } else if (outputCal === undefined) {
-                    setErrorMessage(<div>Please select an output calendar</div>);
+                    console.log("Please select an output calendar");
                     return;
-                } else {
-                    setErrorMessage(<div />);
                 }
                 try {
-                    const filteredEvents = await getFilteredEvents(inputCals, startDate, endDate, regex, accessToken);
+                    const filteredEvents = await getFilteredEvents(inputItems, startDate, endDate, accessToken);
                     await removeEventsFromOutput(outputCal, startDate, endDate, accessToken);
                     await addEventsToOutput(outputCal, filteredEvents, accessToken);
-                    setErrorMessage(<div>Done</div>);
+                    console.log("Done");
                 } catch (e) {
                     if (e.message === "Invalid Date") {
-                        setErrorMessage(<div>Please select a start and end date</div>);
+                        console.log("Please select a start and end date");
                         return;
                     } else if (e.message === "Unauthorized Token") {
                         logout("Token Expired");
@@ -72,160 +76,17 @@ export default ({
                     }
                 }
             }}>Build</button>
-            {errorMessage}
-        </div>
+        </div >
     );
 };
 
-const removeEventsFromOutput = async (
-    outputCal: ICalendar,
-    startDate: string,
-    endDate: string,
-    accessToken: string,
-) => {
-    const isoMin = convertTime(startDate, false);
-    const isoMax = convertTime(endDate, true);
-    const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events?timeMin=${isoMin}&timeMax=${isoMax}`, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-    });
-    if (!response.ok) {
-        throw new Error("Unauthorized Token");
-    }
-    const events = await response.json() as IEventList;
-    const ids = events.items.map((item) => item.id);
-    let eventid;
-    for (eventid of ids) {
-        const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events/${eventid}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
-        if (res.status === 403) {
-            await wait(1000);
-            const res2 = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events/${eventid}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            if (!res2.ok) {
-                throw new Error("Unauthorized Token");
-            }
-        } else if (!res.ok) {
-            throw new Error("Unauthorized Token");
-        }
-    }
-};
-
-const addEventsToOutput = async (
-    outputCal: ICalendar,
-    filteredEvents: IEvent[],
-    accessToken: string,
-) => {
-
-    const reducedEvents = filteredEvents
-        .map((item) => {
-            return {
-                summary: item.summary,
-                start: item.start,
-                end: item.end,
-            };
-        });
-    let reducedEvent;
-    for (reducedEvent of reducedEvents) {
-        const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events`, {
-            method: "POST",
-            body: JSON.stringify(reducedEvent),
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${accessToken}`,
-            },
-        });
-        if (res.status === 403) {
-            await wait(1000);
-            const res2 = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events`, {
-                method: "POST",
-                body: JSON.stringify(reducedEvent),
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`,
-                },
-            });
-            if (!res2.ok) {
-                throw new Error("Unauthorized Token");
-            }
-        } else if (!res.ok) {
-            throw new Error("Unauthorized Token");
-        }
-    }
-};
-
-const getFilteredEvents = async (
-    inputCals: ICalendar[],
-    startDate: string,
-    endDate: string,
-    regex: string,
-    accessToken: string,
-) => {
-    const isoMin = convertTime(startDate, false);
-    const isoMax = convertTime(endDate, true);
-    const compiledRegex = new RegExp(regex);
-    const results = await Promise.all(inputCals.map(async (item) => {
-        const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${item.id}/events?timeMin=${isoMin}&timeMax=${isoMax}`, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
-        if (!response.ok) {
-            throw new Error("Unauthorized Token");
-        }
-        return await response.json() as IEventList;
-    }));
-    const filteredList = results
-        .reduce((prev, curr) => {
-            return [...prev, ...curr.items];
-        }, [] as IEvent[])
-        .filter((item) => {
-            return compiledRegex.test(item.summary);
-        });
-    return filteredList;
-};
-
-const checkRegex = (regex: string): boolean => {
-    try {
-        // tslint:disable-next-line: no-unused-expression
-        new RegExp(regex);
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-
-const convertTime = (date: string, end: boolean): string => {
-    let timeZoneOffsetMinutes = new Date().getTimezoneOffset();
-    let timeZoneOffset = "";
-    if (timeZoneOffsetMinutes !== 0) {
-        timeZoneOffset = timeZoneOffsetMinutes > 0 ? "-" : "+";
-        timeZoneOffsetMinutes = Math.abs(timeZoneOffsetMinutes);
-        let hours = Math.floor(timeZoneOffsetMinutes / 60).toString();
-        hours = hours.length === 1 ? "0" + hours : hours;
-        let mins = (timeZoneOffsetMinutes % 60).toString();
-        mins = mins.length === 1 ? "0" + mins : mins;
-        timeZoneOffset = timeZoneOffset + hours + mins;
-    } else {
-        timeZoneOffset = "Z";
-    }
-    try {
-        const dateObj = new Date(date);
-        if (end) { dateObj.setDate(dateObj.getDate() + 1); }
-        const iso = dateObj.toISOString();
-        const isoAdjusted = iso.substring(0, iso.length - 1) + timeZoneOffset;
-        return isoAdjusted;
-    } catch {
-        throw new Error("Invalid Date");
-    }
-
+const defaultStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateAreas: `"inputT dateT outputT ."
+                        "input  date  output  remove"
+                        "build  build build   build"`,
+    padding: "4px",
+    border: "1px solid black",
+    borderRadius: "5px",
+    backgroundColor: "lavender",
 };

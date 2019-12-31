@@ -4,14 +4,19 @@ export interface ICalendar {
     accessRole: AccessRole;
 }
 
+export interface IInputItem {
+    cal: ICalendar,
+    regex: string,
+    exclude: boolean,
+}
+
 type AccessRole = "reader" | "owner" | "freeBusyReader" | "writer";
 
 export interface ISetting {
-    inputCals: ICalendar[],
+    inputItems: IInputItem[],
     outputCal?: ICalendar,
     startDate: string,
     endDate: string,
-    regex: string,
 }
 
 export interface IEventList {

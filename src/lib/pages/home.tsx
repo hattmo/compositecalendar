@@ -3,18 +3,17 @@ import { ICalendar, ISetting } from "../../types";
 import useDrive from "../helpers/useDrive";
 import Rule from "../components/rule";
 
-interface IProps {
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     accessToken: string;
     logout: (message: string) => void;
 }
 
-export default ({ logout, accessToken }: IProps) => {
+export default ({ logout, accessToken, ...rest }: IProps) => {
     const [calendarList, setCalendarList] = useState<ICalendar[]>([]);
     const [savedSettings, setSavedSettings] = useDrive<ISetting[]>("compositeCalendarData", [{
         startDate: "",
         endDate: "",
-        inputCals: [],
-        regex: "",
+        inputItems: [],
     }], accessToken);
     console.log(savedSettings);
     useEffect(() => {
@@ -40,30 +39,34 @@ export default ({ logout, accessToken }: IProps) => {
         })();
     }, [accessToken]);
     return (
-        <div>
+        <div {...rest}>
             <h1>HOME</h1>
             {savedSettings.map((item, index) => {
-                return (<div><Rule
-                    key={index} savedSettings={item}
+                return (<Rule
+                    key={index}
+                    savedSettings={item}
                     accessToken={accessToken} calendarList={calendarList} logout={logout}
                     setSavedSettings={(newSetting) => {
-                        const updatedSettings = savedSettings.map((oldSetting, i) => {
+                        setSavedSettings(savedSettings.map((oldSetting, i) => {
                             if (i === index) {
                                 return newSetting;
                             } else {
                                 return oldSetting;
                             }
-                        });
-                        setSavedSettings(updatedSettings);
+                        }));
                     }}
-                /><br /></div>);
+                    remove={() => {
+                        setSavedSettings(savedSettings.filter((_oldSetting, i) => {
+                            return i !== index;
+                        }));
+                    }}
+                />);
             })}
             <button onClick={() => {
                 setSavedSettings([...savedSettings, {
                     startDate: "",
                     endDate: "",
-                    inputCals: [],
-                    regex: "",
+                    inputItems: [],
                 }]);
             }}>Add Rule</button>
             <button onClick={() => { logout("Logout Successful"); }}>Logout</button>
