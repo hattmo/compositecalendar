@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from "react";
 import InputCalBlock from "./inputCal/inputCalBlock";
 import { ICalendar, ISetting } from "../../types";
-import FilterBlock from "./filter/filterBlock";
+import FilterBlock from "./date/dateBlock";
 import SelectCal from "./selectCal";
 import { getFilteredEvents, removeEventsFromOutput, addEventsToOutput } from "../helpers/calendarApis";
 import LoadingBar from "./loadingBar/loadingBar";
+import ModalPopup from "./modalPopup/modalPopup";
+import trash from "../../assets/trash.png";
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     calendarList: ICalendar[];
     accessToken: string;
@@ -28,8 +30,8 @@ export default ({
     const [adding, setAdding] = useState(false);
     const [progress, setProgress] = useState(0);
     const [totalValue, setTotalValue] = useState(100);
+    const [modalMessage, setModalMessage] = useState("");
     const { inputItems, outputCal, startDate, endDate } = savedSettings;
-
     const writableCalendars = useMemo(() => {
         return calendarList.filter((item) => {
             return (item.accessRole === "writer" || item.accessRole === "owner");
@@ -68,13 +70,13 @@ export default ({
                 {
                     !loading ? <div style={buildButtonStyle} onClick={async () => {
                         if (inputItems.length === 0) {
-                            console.log("Please select one or more input calendars");
+                            setModalMessage("Please select one or more input calendars");
                             return;
                         } else if (startDate === "" || endDate === "") {
-                            console.log("Please select a start and end date");
+                            setModalMessage("Please select a start and end date");
                             return;
                         } else if (outputCal === undefined) {
-                            console.log("Please select an output calendar");
+                            setModalMessage("Please select an output calendar");
                             return;
                         }
                         try {
@@ -95,10 +97,11 @@ export default ({
                                     setTotalValue(totalVal);
                                 });
                             setLoading(false);
+                            setModalMessage("Build Complete");
                         } catch (e) {
                             setLoading(false);
                             if (e.message === "Invalid Date") {
-                                console.log("Please select a start and end date");
+                                setModalMessage("Please select a start and end date");
                                 return;
                             } else if (e.message === "Unauthorized Token") {
                                 logout("Token Expired");
@@ -108,8 +111,11 @@ export default ({
                     }}>Build</div> :
                         <LoadingBar addStyle={adding} totalValue={totalValue} progress={progress} />
                 }
-                <div style={{ cursor: "pointer" }} onClick={remove}>🗑️</div>
+                <div style={{ cursor: "pointer" }} onClick={remove}><img style={{ width: "20px" }} src={trash} /></div>
             </div>
+            {modalMessage !== "" ? <ModalPopup
+                message={modalMessage}
+                closeModal={() => { setModalMessage(""); }} /> : null}
         </div >
     );
 };

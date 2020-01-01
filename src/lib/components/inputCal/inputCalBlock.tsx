@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SelectCal from "../selectCal";
 import { ICalendar, IInputItem } from "../../../types";
 import InputCalList from "./inputCalList";
+import addIcon from "../../../assets/add.png";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     calendarList: ICalendar[];
@@ -31,7 +32,7 @@ export default ({ calendarList, inputItems, setInputItems, style, ...rest }: IPr
                         regex: "",
                     }, ...inputItems]);
                 }
-            }}>➕</div>
+            }}><img style={{ width: "20px" }} src={addIcon} /></div>
             <InputCalList style={{ gridArea: "items" }} inputItems={inputItems} setInputItems={setInputItems} />
         </div >
     );

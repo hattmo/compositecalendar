@@ -1,6 +1,6 @@
 import React from "react";
 import { IInputItem } from "../../../types";
-
+import trash from "../../../assets/trash.png";
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     inputItems: IInputItem[];
     setInputItems: (newInput: IInputItem[]) => void;
@@ -29,7 +29,7 @@ export default ({ inputItems, setInputItems, style, ...rest }: IProps) => {
                             border: "1px solid black",
                             padding: "2px",
                             fontSize: "8pt",
-                            borderRadius : "4px",
+                            borderRadius: "4px",
                             cursor: "pointer",
                             backgroundColor: (item.exclude ? "lightpink" : "lightgreen"),
                         }} onClick={() => { setInputItems(updateExclude(inputItems, index)); }} >
@@ -39,7 +39,9 @@ export default ({ inputItems, setInputItems, style, ...rest }: IProps) => {
                             setInputItems(updateRegex(e, inputItems, index));
                         }} />
                         <div style={{ cursor: "pointer" }}
-                            onClick={() => { setInputItems(inputItems.filter((_item, i) => i !== index)); }}>🗑️</div>
+                            onClick={() => { setInputItems(inputItems.filter((_item, i) => i !== index)); }}>
+                            <img style={{ width: "20px" }} src={trash} />
+                        </div>
                     </div>
                 );
             })}
