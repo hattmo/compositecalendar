@@ -17,7 +17,10 @@ export default ({ calendarList, inputItems, setInputItems, style, ...rest }: IPr
                 setSelectedCal={setSelectedInputCal}
                 selectedCal={selectedInputCal}
                 cals={calendarList} />
-            <div style={{ gridArea: "add" }} onClick={() => {
+            <div style={{
+                cursor: "pointer",
+                gridArea: "add",
+            }} onClick={() => {
                 if (selectedInputCal !== undefined &&
                     inputItems
                         .map((item) => item.cal)

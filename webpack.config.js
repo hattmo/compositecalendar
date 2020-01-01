@@ -5,11 +5,16 @@ const ts = {
   use: 'ts-loader',
 };
 const html = {
-  test: /\.(html|ico)$/,
+  test: /\.(html|ico|png)$/,
   loader: 'file-loader',
   options: {
     name: '[name].[ext]',
   }
+}
+
+const css = {
+  test: /\.css$/,
+  use: ['style-loader', 'css-loader'],
 }
 
 const config = {
@@ -19,7 +24,7 @@ const config = {
     filename: 'bundle.js',
   },
   module: {
-    rules: [ts, html],
+    rules: [ts, html, css],
   },
   resolve: {
     extensions: [' ', '.js', '.jsx', '.ts', '.tsx'],

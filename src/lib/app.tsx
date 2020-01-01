@@ -6,7 +6,7 @@ import Login from "./pages/login";
 import Home from "./pages/home";
 
 export default () => {
-    const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessKey", null);
+    const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
     const [loginMessage, setLoginMessage] = useState("");
     let routes;
     if (accessToken === null) {

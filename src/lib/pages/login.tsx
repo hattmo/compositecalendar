@@ -1,4 +1,6 @@
 import React from "react";
+import loginNormal from "../../assets/loginNormal.png";
+
 const clientId = "1080184656423-2ue1gt1t85mhe98mac7nqipqhl2c55d4.apps.googleusercontent.com";
 const redirectUri = "http://compositecalendar.hattmo.com/auth";
 const scope = "https://www.googleapis.com/auth/calendar%20https://www.googleapis.com/auth/drive.appdata";
@@ -7,14 +9,36 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     message: string;
 }
 
-export default ({ message, ...rest }: IProps) => {
+export default ({ message, style, ...rest }: IProps) => {
     return (
-        <div {...rest}>
-            <h1>
-                Login
-            </h1 >
-            <button onClick={() => { location.href = googleUri; }}>Login</button>
-            {message}
+        <div style={{ ...defaultStyle, ...rest }} {...rest}>
+            <div style={panelStyle}>
+                <div style={{
+                    fontSize: "30pt",
+                }}>
+                    Composite Calendar
+                </div >
+                <a href={googleUri}>
+                    <img style={{ width: "150px" }} src={loginNormal} />
+                </a>
+                {message}
+            </div>
         </div >
     );
+};
+
+const defaultStyle: React.CSSProperties = {
+    display: "grid",
+    height: "100%",
+    placeItems: "center",
+};
+
+const panelStyle: React.CSSProperties = {
+    display: "grid",
+    placeItems: "center",
+    gap: "10px",
+    padding: "40px",
+    border: "1px solid black",
+    borderRadius: "8px",
+    backgroundColor: "lavender",
 };

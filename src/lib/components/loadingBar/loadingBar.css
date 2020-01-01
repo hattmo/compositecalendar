@@ -1,0 +1,20 @@
+@keyframes animatedBackground {
+	from { background-position: 0 0; }
+	to { background-position: 100px 0; }
+}
+
+.loadingBarAdd	{
+	background-image: url(./loadingBarAdd.png);
+	background-position: 0px 0px;
+	background-repeat: repeat;
+
+	animation: animatedBackground 1s linear infinite;
+}
+
+.loadingBarDelete	{
+	background-image: url(./loadingBarDelete.png);
+	background-position: 0px 0px;
+	background-repeat: repeat;
+
+	animation: animatedBackground 1s linear infinite;
+}

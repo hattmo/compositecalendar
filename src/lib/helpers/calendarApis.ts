@@ -7,19 +7,15 @@ export const removeEventsFromOutput = async (
     startDate: string,
     endDate: string,
     accessToken: string,
+    progressCB: (progress: number, totalValue: number) => void,
 ) => {
     const isoMin = convertTime(startDate, false);
     const isoMax = convertTime(endDate, true);
-    const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events?timeMin=${isoMin}&timeMax=${isoMax}`, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-    });
-    if (!response.ok) {
-        throw new Error("Unauthorized Token");
-    }
-    const events = await response.json() as IEventList;
-    const ids = events.items.map((item) => item.id);
+    const events = await getEventsRecursive(outputCal.id, isoMin, isoMax, accessToken);
+    const ids = events.map((item) => item.id);
+    const eventCount = ids.length;
+    let eventsDeleted = 0;
+    progressCB(eventsDeleted, eventCount);
     let eventid;
     for (eventid of ids) {
         const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events/${eventid}`, {
@@ -29,7 +25,7 @@ export const removeEventsFromOutput = async (
             },
         });
         if (res.status === 403) {
-            await wait(1000);
+            await wait(2000);
             const res2 = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events/${eventid}`, {
                 method: "DELETE",
                 headers: {
@@ -42,6 +38,8 @@ export const removeEventsFromOutput = async (
         } else if (!res.ok) {
             throw new Error("Unauthorized Token");
         }
+        eventsDeleted++;
+        progressCB(eventsDeleted, eventCount);
     }
 };
 
@@ -49,6 +47,7 @@ export const addEventsToOutput = async (
     outputCal: ICalendar,
     filteredEvents: IEvent[],
     accessToken: string,
+    progressCB: (progress: number, totalValue: number) => void,
 ) => {
 
     const reducedEvents = filteredEvents
@@ -59,6 +58,9 @@ export const addEventsToOutput = async (
                 end: item.end,
             };
         });
+    const eventCount = reducedEvents.length;
+    let eventsAdded = 0;
+    progressCB(eventsAdded, eventCount);
     let reducedEvent;
     for (reducedEvent of reducedEvents) {
         const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${outputCal.id}/events`, {
@@ -85,6 +87,8 @@ export const addEventsToOutput = async (
         } else if (!res.ok) {
             throw new Error("Unauthorized Token");
         }
+        eventsAdded++;
+        progressCB(eventsAdded, eventCount);
     }
 };
 
@@ -97,17 +101,9 @@ export const getFilteredEvents = async (
     const isoMin = convertTime(startDate, false);
     const isoMax = convertTime(endDate, true);
     return (await Promise.all(inputItems.map(async (inputItem) => {
-        const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${inputItem.cal.id}/events?timeMin=${isoMin}&timeMax=${isoMax}`, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
-        if (!response.ok) {
-            throw new Error("Unauthorized Token");
-        }
-        const events = await response.json() as IEventList;
+        const events = await getEventsRecursive(inputItem.cal.id, isoMin, isoMax, accessToken);
         const compiledRegex = new RegExp(inputItem.regex);
-        return events.items.filter((event) => {
+        return events.filter((event) => {
             if (inputItem.exclude) {
                 return !compiledRegex.test(event.summary);
             } else {
@@ -117,4 +113,33 @@ export const getFilteredEvents = async (
     }))).reduce((prev, curr) => {
         return [...prev, ...curr];
     }, [] as IEvent[]);
+};
+
+const getEventsRecursive = async (
+    calId: string,
+    timeMin: string,
+    timeMax: string,
+    accessToken: string,
+    nextPageToken?: string,
+): Promise<IEvent[]> => {
+    // tslint:disable-next-line: max-line-length
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${calId}/events?timeMin=${timeMin}&timeMax=${timeMax}` + (nextPageToken === undefined ? "" : `&pageToken=${nextPageToken}`);
+    console.log(url);
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error("Unauthorized Token");
+    }
+    const events = await response.json() as IEventList;
+    if (events.nextPageToken !== undefined) {
+        return [
+            ...events.items,
+            ...(await getEventsRecursive(calId, timeMin, timeMax, accessToken, events.nextPageToken)),
+        ];
+    } else {
+        return events.items;
+    }
 };

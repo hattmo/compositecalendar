@@ -25,13 +25,21 @@ export default ({ inputItems, setInputItems, style, ...rest }: IProps) => {
                         }}>
                             {item.cal.name}
                         </div>
-                        <input type="checkbox" checked={item.exclude} onChange={() => {
-                            setInputItems(updateExclude(inputItems, index));
-                        }} />
+                        <div style={{
+                            border: "1px solid black",
+                            padding: "2px",
+                            fontSize: "8pt",
+                            borderRadius : "4px",
+                            cursor: "pointer",
+                            backgroundColor: (item.exclude ? "lightpink" : "lightgreen"),
+                        }} onClick={() => { setInputItems(updateExclude(inputItems, index)); }} >
+                            {item.exclude ? "excl." : "incl."}
+                        </div>
                         <input type="text" value={item.regex} onChange={(e) => {
                             setInputItems(updateRegex(e, inputItems, index));
                         }} />
-                        <div onClick={() => { setInputItems(inputItems.filter((_item, i) => i !== index)); }}>🗑️</div>
+                        <div style={{ cursor: "pointer" }}
+                            onClick={() => { setInputItems(inputItems.filter((_item, i) => i !== index)); }}>🗑️</div>
                     </div>
                 );
             })}
