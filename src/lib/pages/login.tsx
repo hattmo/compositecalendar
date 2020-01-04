@@ -2,7 +2,7 @@ import React from "react";
 import loginNormal from "../../assets/loginNormal.png";
 
 const clientId = "1080184656423-2ue1gt1t85mhe98mac7nqipqhl2c55d4.apps.googleusercontent.com";
-const redirectUri = "http://compositecalendar.hattmo.com/auth";
+const redirectUri = "http://compositecalendar.com/auth";
 const scope = "https://www.googleapis.com/auth/calendar%20https://www.googleapis.com/auth/drive.appdata";
 const googleUri = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=token`;
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {

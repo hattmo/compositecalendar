@@ -9,4 +9,5 @@ COPY ./src ./src
 RUN npx webpack --mode production
 
 FROM nginx
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=0 /app/dist/ /usr/share/nginx/html
