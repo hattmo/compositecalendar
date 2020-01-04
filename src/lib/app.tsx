@@ -4,13 +4,15 @@ import { useLocalStorage } from "web-api-hooks";
 import Auth from "./pages/auth";
 import Login from "./pages/login";
 import Home from "./pages/home";
+import Privacy from "./pages/privacy";
+import Terms from "./pages/terms";
 
 export default () => {
     const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
     const [loginMessage, setLoginMessage] = useState("");
-    let routes;
-    if (accessToken === null) {
-        routes = (
+
+    return (
+        <Router>
             <Switch>
                 <Route path="/login">
                     <Login message={loginMessage} />
@@ -19,24 +21,22 @@ export default () => {
                     <Auth onFailedLogin={() => { setLoginMessage("Failed to Login"); }}
                         onSuccessfulLogin={setAccessToken} />
                 </Route>
+                <Route path="/privacy">
+                    <Privacy/>
+                </Route>
+                <Route path="/terms">
+                    <Terms/>
+                </Route>
                 <Route>
-                    <Redirect to="/login" />
+                    {accessToken !== null ?
+                        (<Home accessToken={accessToken} logout={(message) => {
+                            setLoginMessage(message);
+                            setAccessToken(null);
+                        }} />) :
+                        (<Redirect to="/login" />)
+                    }
                 </Route>
             </Switch>
-        );
-    } else {
-        routes = (
-            <Route >
-                <Home accessToken={accessToken} logout={(message) => {
-                    setLoginMessage(message);
-                    setAccessToken(null);
-                }} />
-            </Route>
-        );
-    }
-    return (
-        <Router>
-            {routes}
         </Router>
     );
 };
