@@ -53,6 +53,7 @@ export const addEventsToOutput = async (
     const reducedEvents = filteredEvents
         .map((item) => {
             return {
+                description: item.description,
                 summary: item.summary,
                 start: item.start,
                 end: item.end,
