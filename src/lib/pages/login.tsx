@@ -1,5 +1,6 @@
 import React from "react";
 import loginNormal from "../../assets/loginNormal.png";
+import { Link } from "react-router-dom";
 
 const clientId = "1080184656423-2ue1gt1t85mhe98mac7nqipqhl2c55d4.apps.googleusercontent.com";
 const redirectUri = "https://compositecalendar.com/auth";
@@ -22,6 +23,15 @@ export default ({ message, style, ...rest }: IProps) => {
                     <img style={{ width: "150px" }} src={loginNormal} />
                 </a>
                 {message}
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "auto auto",
+                    padding: "4px",
+                    gap: "4px",
+                }}>
+                    <Link to="/terms">Terms</Link>
+                    <Link to="/privacy">Privacy</Link>
+                </div>
             </div>
         </div >
     );
