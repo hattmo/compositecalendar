@@ -1,7 +1,7 @@
 FROM node
 WORKDIR /app/
 COPY ./tsconfig.json ./
-COPY ./webpack.config.js ./
+COPY ./webpack.config.ts ./
 COPY ./package.json ./
 COPY ./package-lock.json ./
 RUN npm ci --ignore-scripts
