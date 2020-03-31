@@ -67,6 +67,24 @@ resource "kubernetes_deployment" "app" {
   }
 }
 
+resource "kubernetes_service" "app" {
+  metadata {
+    name = local.appname
+  }
+  spec {
+    selector = {
+      app = local.appname
+    }
+    session_affinity = "ClientIP"
+    port {
+      port        = 80
+      target_port = 80
+    }
+
+    type = "NodePort"
+  }
+}
+
 resource "google_dns_managed_zone" "compositecalendar-zone" {
   name     = "compositecalendar"
   dns_name = "compositecalendar.com."
