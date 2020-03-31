@@ -2,7 +2,7 @@
 
 ## About
 
-Combined and Filters Google Calendars
+Client App for composite calendar
 
 ## Author
 

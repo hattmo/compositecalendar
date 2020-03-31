@@ -1,4 +1,6 @@
-const path = require('path');
+import path from 'path';
+import webpack from "webpack";
+import WebpackDevServer from 'webpack-dev-server';
 
 const ts = {
   test: /\.ts(x)?$/,
@@ -17,7 +19,16 @@ const css = {
   use: ['style-loader', 'css-loader'],
 }
 
-const config = {
+const devServer: WebpackDevServer.Configuration = {
+  port: 12345,
+  historyApiFallback: true,
+  disableHostCheck: true,
+  contentBase: path.resolve(__dirname, 'dist/'),
+  inline: true,
+  hot: true,
+}
+
+const config: webpack.Configuration = {
   entry: './src/main.tsx',
   output: {
     path: path.resolve(__dirname, 'dist/'),
@@ -29,5 +40,10 @@ const config = {
   resolve: {
     extensions: [' ', '.js', '.jsx', '.ts', '.tsx'],
   },
+
+  devServer,
 };
+
+
+
 module.exports = config;
