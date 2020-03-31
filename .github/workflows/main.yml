@@ -22,8 +22,33 @@ jobs:
           DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
         run: |
           docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-          VERSION="$(node -e "console.log(require('./package.json').version)")"
-          APPNAME="$(node -e "console.log(require('./package.json').name.substring(1))")"
-          docker build -t $APPNAME:latest -t $APPNAME:$VERSION .
-          docker push $APPNAME:latest
-          docker push $APPNAME:$VERSION
+          TF_VAR_VERSION="$(node -e "console.log(require('./package.json').version)")"
+          TF_VAR_APPNAME="$(node -e "console.log(require('./package.json').name.substring(1))")"
+          docker build -t $TF_VAR_APPNAME:latest -t $TF_VAR_APPNAME:$TF_VAR_VERSION .
+          docker push $TF_VAR_APPNAME:latest
+          docker push $TF_VAR_APPNAME:$TF_VAR_VERSION
+      - name: "Terraform Init"
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.12.21
+          tf_actions_subcommand: "init"
+          tf_actions_comment: false
+        env:
+          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_CREDENTIALS}}
+      - name: "Terraform Plan"
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.12.21
+          tf_actions_subcommand: "plan"
+          tf_actions_comment: false
+        env:
+          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_CREDENTIALS}}
+      - name: "Terraform Apply"
+        if: startsWith(github.ref,'refs/tags/')
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.12.21
+          tf_actions_subcommand: "apply"
+          tf_actions_comment: false
+        env:
+          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_CREDENTIALS}}

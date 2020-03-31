@@ -63,7 +63,7 @@ export default ({
                 gridTemplateColumns: "auto min-content",
                 gridArea: "buttons",
             }}>
-                <div style={buildButtonStyle} onClick={}>Save</div>
+                <div style={buildButtonStyle} onClick={() => { console.log("save clicked")}}>Save</div>
                 <div style={{ cursor: "pointer" }} onClick={remove}><img style={{ width: "20px" }} src={trash} /></div>
             </div>
             {modalMessage !== "" ? <ModalPopup

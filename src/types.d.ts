@@ -14,7 +14,7 @@ type AccessRole = "reader" | "owner" | "freeBusyReader" | "writer";
 
 export interface ISetting {
     inputItems: IInputItem[];
-    outputCal: ICalendar;
+    outputCal?: ICalendar;
     startDate: string;
     endDate: string;
 }

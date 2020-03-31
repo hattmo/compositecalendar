@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ICalendar, ISetting } from "../../types";
 import Rule from "../components/rule";
 import logoutImg from "../../assets/logout.png";
+import useCalendarList from "../helpers/useCalendarList";
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     accessToken: string;
     logout: (message: string) => void;
@@ -11,7 +12,9 @@ export default ({ logout, accessToken, style, ...rest }: IProps) => {
     const [calendarList, setCalendarList] = useState<ICalendar[]>([]);
     const [currentSettings, setCurrentSettings] = useState<ISetting[]>([]);
     const writeableCalendarList = calendarList.filter((item) => item.accessRole === "writer" || item.accessRole === "owner");
-
+    useCalendarList(list => {
+        setCalendarList(list)
+    })
     return (
         <div style={{ ...defaultStyle, ...style }} {...rest}>
             <div style={{
@@ -20,6 +23,7 @@ export default ({ logout, accessToken, style, ...rest }: IProps) => {
             {
                 currentSettings.map((item, index) => {
                     return (<Rule
+                        writeableCalendarList={writeableCalendarList}
                         key={index}
                         savedSettings={item}
                         accessToken={accessToken} calendarList={calendarList} logout={logout}

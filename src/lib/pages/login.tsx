@@ -3,10 +3,9 @@ import loginNormal from "../../assets/loginNormal.png";
 import { Link } from "react-router-dom";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
-    message: string;
 }
 
-export default ({ message, style, ...rest }: IProps) => {
+export default ({ style, ...rest }: IProps) => {
     return (
         <div style={{ ...defaultStyle, ...rest }} {...rest}>
             <div style={panelStyle}>
@@ -18,7 +17,6 @@ export default ({ message, style, ...rest }: IProps) => {
                 <a href={"/login"}>
                     <img style={{ width: "150px" }} src={loginNormal} />
                 </a>
-                {message}
                 <div style={{
                     display: "grid",
                     gridTemplateColumns: "auto auto",

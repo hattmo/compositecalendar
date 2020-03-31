@@ -1,6 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
-import Auth from "./pages/auth";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Login from "./pages/login";
 import Home from "./pages/home";
 import Privacy from "./pages/privacy";
@@ -12,22 +11,16 @@ export default () => {
         <Router>
             <Switch>
                 <Route path="/login">
-                    <Login message={loginMessage} />
+                    <Login />
                 </Route>
                 <Route path="/privacy">
-                    <Privacy/>
+                    <Privacy />
                 </Route>
                 <Route path="/terms">
-                    <Terms/>
+                    <Terms />
                 </Route>
                 <Route>
-                    {accessToken !== null ?
-                        (<Home accessToken={accessToken} logout={(message) => {
-                            setLoginMessage(message);
-                            setAccessToken(null);
-                        }} />) :
-                        (<Redirect to="/login" />)
-                    }
+                    <Home />
                 </Route>
             </Switch>
         </Router>
