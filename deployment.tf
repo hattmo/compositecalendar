@@ -20,10 +20,10 @@ provider "google" {
 
 provider "kubernetes" {
   load_config_file       = "false"
-  host                   = data.terraform_remote_state.infrastructure.outputs.host
-  client_certificate     = base64decode(data.terraform_remote_state.infrastructure.outputs.client_certificate)
-  client_key             = base64decode(data.terraform_remote_state.infrastructure.outputs.client_key)
-  cluster_ca_certificate = base64decode(data.terraform_remote_state.infrastructure.outputs.ca_certificate)
+  host                   = data.terraform_remote_state.infrastructure.outputs.kube_host
+  client_certificate     = base64decode(data.terraform_remote_state.infrastructure.outputs.kube_client_certificate)
+  client_key             = base64decode(data.terraform_remote_state.infrastructure.outputs.kube_client_key)
+  cluster_ca_certificate = base64decode(data.terraform_remote_state.infrastructure.outputs.kube_ca_certificate)
 }
 
 locals {
