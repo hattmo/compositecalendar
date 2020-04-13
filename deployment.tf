@@ -18,10 +18,6 @@ provider "google" {
   project = "compositecalendar"
 }
 
-provider "google-beta" {
-  project = "compositecalendar"
-}
-
 provider "kubernetes" {
   load_config_file       = "false"
   host                   = data.terraform_remote_state.infrastructure.outputs.host
@@ -39,7 +35,7 @@ locals {
 
 resource "kubernetes_deployment" "app" {
   metadata {
-    name = local.appname
+    name = "${local.appname}-deployment"
     labels = {
       app = local.appname
     }
@@ -69,7 +65,7 @@ resource "kubernetes_deployment" "app" {
 
 resource "kubernetes_service" "app" {
   metadata {
-    name = local.appname
+    name = "${local.appname}-service"
   }
   spec {
     selector = {
@@ -84,6 +80,57 @@ resource "kubernetes_service" "app" {
     type = "NodePort"
   }
 }
+
+
+resource "kubernetes_ingress" "compositecalendar-ingress" {
+  metadata {
+    name = "compositecalendar-ingress"
+    annotations = {
+      "networking.gke.io/managed-certificates" = "compositecalendar-cert"
+    }
+  }
+
+  spec {
+    backend {
+      service_name = compositecalendarclient-service
+      service_port = 80
+    }
+
+    rule {
+      http {
+        path {
+          backend {
+            service_name = compositecalendarclient-service
+            service_port = 80
+          }
+          path = "/"
+        }
+        path {
+          backend {
+            service_name = compositecalendarauth-service
+            service_port = 80
+          }
+          path = "/auth"
+        }
+        path {
+          backend {
+            service_name = compositecalendarauth-service
+            service_port = 80
+          }
+          path = "/login"
+        }
+        path {
+          backend {
+            service_name = compositecalendarapi-service
+            service_port = 80
+          }
+          path = "/api"
+        }
+      }
+    }
+  }
+}
+
 
 resource "google_dns_managed_zone" "compositecalendar-zone" {
   name     = "compositecalendar"
@@ -110,19 +157,8 @@ resource "google_dns_managed_zone" "compositecalendar-zone" {
 
 resource "google_dns_record_set" "compositecalendar-record" {
   name         = "compositecalendar.com."
-  rrdatas      = ["34.102.171.222"]
+  rrdatas      = length(kubernetes_ingress.compositecalendar-ingress.load_balancer_ingress) > 0 ? kubernetes_ingress.compositecalendar-ingress.load_balancer_ingress[*].ip : ["127.0.0.1"]
   ttl          = "300"
   type         = "A"
   managed_zone = google_dns_managed_zone.compositecalendar-zone.name
-}
-
-
-resource "google_compute_managed_ssl_certificate" "compositecalendar-cert" {
-  provider = google-beta
-
-  name = "compositecalendar"
-
-  managed {
-    domains = ["compositecalendar.com."]
-  }
 }
