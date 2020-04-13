@@ -92,7 +92,7 @@ resource "kubernetes_ingress" "compositecalendar-ingress" {
 
   spec {
     backend {
-      service_name = compositecalendarclient-service
+      service_name = "compositecalendarclient-service"
       service_port = 80
     }
 
@@ -100,28 +100,28 @@ resource "kubernetes_ingress" "compositecalendar-ingress" {
       http {
         path {
           backend {
-            service_name = compositecalendarclient-service
+            service_name = "compositecalendarclient-service"
             service_port = 80
           }
           path = "/"
         }
         path {
           backend {
-            service_name = compositecalendarauth-service
+            service_name = "compositecalendarauth-service"
             service_port = 80
           }
           path = "/auth"
         }
         path {
           backend {
-            service_name = compositecalendarauth-service
+            service_name = "compositecalendarauth-service"
             service_port = 80
           }
           path = "/login"
         }
         path {
           backend {
-            service_name = compositecalendarapi-service
+            service_name = "compositecalendarapi-service"
             service_port = 80
           }
           path = "/api"
