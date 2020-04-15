@@ -6,11 +6,11 @@ const ts = {
   test: /\.ts(x)?$/,
   use: 'ts-loader',
 };
-const html = {
+const fileLoad = {
   test: /\.(html|ico|png)$/,
   loader: 'file-loader',
   options: {
-    name: '[name].[ext]',
+    name: '/[name].[ext]',
   }
 }
 
@@ -20,12 +20,29 @@ const css = {
 }
 
 const devServer: WebpackDevServer.Configuration = {
-  port: 12345,
+  port: 8080,
   historyApiFallback: true,
   disableHostCheck: true,
   contentBase: path.resolve(__dirname, 'dist/'),
   inline: true,
   hot: true,
+  proxy: {
+    "/login": {
+      changeOrigin: true,
+      cookieDomainRewrite: "localhost",
+      target: "http://localhost:8081",
+    },
+    "/auth": {
+      changeOrigin: true,
+      cookieDomainRewrite: "localhost",
+      target: "http://localhost:8081",
+    },
+    "/api": {
+      changeOrigin: true,
+      cookieDomainRewrite: "localhost",
+      target: "http://localhost:8082",
+    }
+  }
 }
 
 const config: webpack.Configuration = {
@@ -35,7 +52,7 @@ const config: webpack.Configuration = {
     filename: 'bundle.js',
   },
   module: {
-    rules: [ts, html, css],
+    rules: [ts, fileLoad, css],
   },
   resolve: {
     extensions: [' ', '.js', '.jsx', '.ts', '.tsx'],

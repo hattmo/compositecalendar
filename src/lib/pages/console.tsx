@@ -4,11 +4,10 @@ import Rule from "../components/rule";
 import logoutImg from "../../assets/logout.png";
 import useCalendarList from "../helpers/useCalendarList";
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
-    accessToken: string;
     logout: (message: string) => void;
 }
 
-export default ({ logout, accessToken, style, ...rest }: IProps) => {
+export default ({ logout, style, ...rest }: IProps) => {
     const [calendarList, setCalendarList] = useState<ICalendar[]>([]);
     const [currentSettings, setCurrentSettings] = useState<ISetting[]>([]);
     const writeableCalendarList = calendarList.filter((item) => item.accessRole === "writer" || item.accessRole === "owner");
@@ -22,26 +21,29 @@ export default ({ logout, accessToken, style, ...rest }: IProps) => {
             }}>Composite Calendar</div>
             {
                 currentSettings.map((item, index) => {
-                    return (<Rule
-                        writeableCalendarList={writeableCalendarList}
-                        key={index}
-                        savedSettings={item}
-                        accessToken={accessToken} calendarList={calendarList} logout={logout}
-                        setSavedSettings={(newSetting) => {
-                            setCurrentSettings(currentSettings.map((oldSetting, i) => {
-                                if (i === index) {
-                                    return newSetting;
-                                } else {
-                                    return oldSetting;
-                                }
-                            }));
-                        }}
-                        remove={() => {
-                            setCurrentSettings(currentSettings.filter((_oldSetting, i) => {
-                                return i !== index;
-                            }));
-                        }}
-                    />);
+                    return (
+                        <Rule
+                            writeableCalendarList={writeableCalendarList}
+                            key={index}
+                            savedSettings={item}
+                            calendarList={calendarList}
+                            logout={logout}
+                            setSavedSettings={(newSetting) => {
+                                setCurrentSettings(currentSettings.map((oldSetting, i) => {
+                                    if (i === index) {
+                                        return newSetting;
+                                    } else {
+                                        return oldSetting;
+                                    }
+                                }));
+                            }}
+                            remove={() => {
+                                setCurrentSettings(currentSettings.filter((_oldSetting, i) => {
+                                    return i !== index;
+                                }));
+                            }}
+                        />
+                    );
                 })
             }
             <div

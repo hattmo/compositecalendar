@@ -124,7 +124,7 @@ resource "kubernetes_ingress" "compositecalendar-ingress" {
             service_name = "compositecalendarapi-service"
             service_port = 80
           }
-          path = "/api"
+          path = "/api/*"
         }
       }
     }

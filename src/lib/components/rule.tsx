@@ -9,7 +9,6 @@ import trash from "../../assets/trash.png";
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     calendarList: ICalendar[];
     writeableCalendarList: ICalendar[];
-    accessToken: string;
     logout: (message: string) => void;
     savedSettings: ISetting;
     setSavedSettings: (newSettings: ISetting) => void;
@@ -18,7 +17,6 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export default ({
     calendarList,
-    accessToken,
     logout,
     savedSettings,
     setSavedSettings,
@@ -63,7 +61,7 @@ export default ({
                 gridTemplateColumns: "auto min-content",
                 gridArea: "buttons",
             }}>
-                <div style={buildButtonStyle} onClick={() => { console.log("save clicked")}}>Save</div>
+                <div style={buildButtonStyle} onClick={() => { console.log("save clicked") }}>Save</div>
                 <div style={{ cursor: "pointer" }} onClick={remove}><img style={{ width: "20px" }} src={trash} /></div>
             </div>
             {modalMessage !== "" ? <ModalPopup
