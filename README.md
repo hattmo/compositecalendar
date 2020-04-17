@@ -2,7 +2,7 @@
 
 ## About
 
-Client App for composite calendar.
+Client App for composite calendar
 
 ## Author
 
